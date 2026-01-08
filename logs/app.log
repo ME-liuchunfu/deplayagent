@@ -1,0 +1,45 @@
+2026-01-08 16:30:31 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 16:30:31 - INFO - jpacompement:37 - 插入主机信息:{'id': -1, 'name': 'nginx_gt', 'host': '192.100.29.131', 'port': 22, 'username': 'root', 'password': 'root', 'private_key': None, 'private_key_password': None, 'remark': 'nginx网关'}
+2026-01-08 16:30:31 - INFO - base:33 - MySQL连接已关闭
+2026-01-08 16:32:05 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 16:33:14 - INFO - base:33 - MySQL连接已关闭
+2026-01-08 16:33:18 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 16:33:23 - INFO - base:33 - MySQL连接已关闭
+2026-01-08 16:34:26 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 16:34:26 - INFO - base:33 - MySQL连接已关闭
+2026-01-08 16:34:53 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 16:34:53 - INFO - jpacompement:63 - 删除主机信息id:4
+2026-01-08 16:34:53 - INFO - base:33 - MySQL连接已关闭
+2026-01-08 16:59:31 - INFO - __init__:16 - 序号:	操作:
+
+2026-01-08 16:59:31 - INFO - __init__:18 - 0	查看 已拉取镜像
+
+2026-01-08 16:59:31 - INFO - __init__:18 - 1	查询 新版本镜像
+
+2026-01-08 16:59:31 - INFO - __init__:18 - 2	更新 新版本镜像
+
+2026-01-08 17:11:17 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 17:11:17 - INFO - base:33 - MySQL连接已关闭
+2026-01-08 17:52:55 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 17:52:55 - INFO - base:33 - MySQL连接已关闭
+2026-01-08 17:52:55 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 17:52:55 - INFO - jpacompement:304 - 插入镜像信息主机信息:{'id': -1, 'images_id': 'test/redis:7', 'images_name': 'test/redis:7', 'images_version': '7', 'images_size': '42.94MB'}
+2026-01-08 17:52:55 - INFO - base:33 - MySQL连接已关闭
+2026-01-08 17:52:55 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 17:52:55 - INFO - base:33 - MySQL连接已关闭
+2026-01-08 17:52:55 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 17:52:55 - INFO - jpacompement:304 - 插入镜像信息主机信息:{'id': -1, 'images_id': 'test/redis:6.2', 'images_name': 'test/redis:6.2', 'images_version': '6.2', 'images_size': '38.31MB'}
+2026-01-08 17:52:55 - INFO - base:33 - MySQL连接已关闭
+2026-01-08 17:54:12 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 17:54:12 - INFO - base:33 - MySQL连接已关闭
+2026-01-08 17:54:20 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 17:54:20 - INFO - base:33 - MySQL连接已关闭
+2026-01-08 17:54:20 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 17:54:20 - INFO - jpacompement:304 - 插入镜像信息主机信息:{'id': -1, 'images_id': 'test/nginx:1.28', 'images_name': 'test/nginx:1.28', 'images_version': '1.28', 'images_size': '56.99MB'}
+2026-01-08 17:54:20 - INFO - base:33 - MySQL连接已关闭
+2026-01-08 17:54:24 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 17:54:24 - INFO - base:33 - MySQL连接已关闭
+2026-01-08 18:02:28 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 18:02:28 - INFO - base:33 - MySQL连接已关闭
+2026-01-08 18:02:50 - INFO - base:26 - 成功连接到MySQL数据库
+2026-01-08 18:02:50 - INFO - base:33 - MySQL连接已关闭
