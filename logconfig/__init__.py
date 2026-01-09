@@ -38,9 +38,11 @@ def setup_rotating_log(
     logger.addHandler(file_handler)
 
     # 4. 配置控制台输出（可选，方便调试）
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
+    dev_env = os.getenv('DEV_ENV')
+    if dev_env is not None:
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
 
     # 5. 清理超过 keep_days 的过期日志文件
     def clean_expired_logs():

@@ -26,6 +26,16 @@ CREATE TABLE IF NOT EXISTS `agent_nginx_bls_machine`  (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='nginx 负载主机';
 
 
+CREATE TABLE IF NOT EXISTS `agent_nginx_bls_weight`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(120) NOT NULL COMMENT '名称',
+  `bls_machine_id` bigint(20) DEFAULT NULL,
+  `command_config_path` varchar(3000) DEFAULT NULL,
+  `status` varchar(300) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='nginx 负载项';
+
+
 CREATE TABLE IF NOT EXISTS `agent_container_pods`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(120) NOT NULL COMMENT '名称',
@@ -37,6 +47,17 @@ CREATE TABLE IF NOT EXISTS `agent_container_pods`  (
   `status` varchar(300) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='服务容器主机';
+
+CREATE TABLE IF NOT EXISTS `agent_container_pods_version`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(120) NOT NULL COMMENT '名称',
+  `server_id` bigint(20) DEFAULT NULL,
+  `pods_id` bigint(20) DEFAULT NULL,
+  `command_path` varchar(3000) DEFAULT NULL,
+  `images_id` varchar(3000) DEFAULT NULL,
+  `images_name` varchar(3000) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='服务容器版本';
 
 
 CREATE TABLE IF NOT EXISTS `agent_images_infos`  (

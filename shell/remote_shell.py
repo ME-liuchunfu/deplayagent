@@ -3,8 +3,12 @@
 """
 import os
 import paramiko
+import pexpect
 from scp import SCPClient, SCPException
 from typing import Optional, List, Tuple
+import sys
+
+from shell import ShellResult
 
 
 class SSHSCPTool:
@@ -192,3 +196,186 @@ class SSHSCPTool:
         """支持 with 语句自动关闭连接"""
         self.close()
 
+
+def ssh_interactive_connect(host: str, port: int, username: str, password: str):
+    """
+    Python 实现 全交互式 SSH 远程连接
+    :param host: 远程服务器IP/域名
+    :param port: SSH端口，默认22
+    :param username: 远程登录用户名
+    :param password: 远程登录密码
+    """
+    # 创建SSH客户端实例
+    ssh = paramiko.SSHClient()
+    # 自动接受远程主机的密钥（首次连接不报错）
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    try:
+        # 建立SSH连接
+        ssh.connect(
+            hostname=host,
+            port=port,
+            username=username,
+            password=password,
+            timeout=15,
+            look_for_keys=False,
+            allow_agent=False,
+            banner_timeout=30
+        )
+        print(f"✅ 成功连接远程服务器：{username}@{host}:{port}")
+        print("💡 使用提示：输入任意Linux命令即可执行，输入 exit 回车 断开连接\n")
+
+        # ========== 核心：Paramiko原生交互式Shell（Windows核心关键） ==========
+        # invoke_shell() 是Paramiko内置的交互式shell，模拟真实终端，无需pty！
+        channel = ssh.invoke_shell(term='xterm', width=120, height=35)
+        channel.settimeout(0.01)  # 极低超时，避免阻塞，Windows友好
+
+        # 接收并打印连接后的欢迎信息/命令提示符
+        while channel.recv_ready():
+            output = channel.recv(4096).decode('utf-8', errors='ignore')
+            sys.stdout.write(output)
+            sys.stdout.flush()
+
+        # ========== 双向实时交互核心逻辑 ==========
+        while True:
+            if channel.recv_ready():
+                output = channel.recv(4096).decode('utf-8', errors='ignore')
+                sys.stdout.write(output)
+                sys.stdout.flush()
+                if not output: break
+
+            try:
+                cmd = sys.stdin.readline()
+                if cmd.strip().lower() == 'exit':
+                    print(f"用户主动退出，断开SSH连接")
+                    channel.send(cmd)
+                    break
+                channel.send(cmd)
+                print(f"发送命令到服务器: {cmd.strip()}")
+            except KeyboardInterrupt:
+                print("用户手动中断输入")
+                continue
+
+    except paramiko.AuthenticationException:
+        print("❌ 认证失败：用户名或密码错误！")
+    except paramiko.SSHException as e:
+        print(f"❌ SSH连接异常：{str(e)}，可能是服务器SSH服务未启动")
+    except Exception as e:
+        print(f"❌ 未知异常：{str(e)}")
+    finally:
+        # 确保连接正常关闭
+        if ssh.get_transport() and ssh.get_transport().is_active():
+            ssh.close()
+        print("✅ SSH连接已正常断开")
+
+
+def ssh_pexpect_interactive_single(host: str, user: str, password: str, port: int = 22):
+    """
+    pexpect 实现极简交互式SSH
+    :param host: 远程IP/域名
+    :param user: 用户名
+    :param password: 密码
+    :param port: SSH端口
+    """
+    # 核心命令：生成ssh连接指令
+    ssh_cmd = f"ssh {user}@{host} -p {port}"
+    # 启动交互式SSH进程
+    child = pexpect.spawn(ssh_cmd)
+
+    # 匹配登录过程的交互提示
+    try:
+        # 匹配 "password:" 密码输入提示
+        child.expect("password:")
+        # 输入密码并回车
+        child.sendline(password)
+        # 匹配远程服务器的命令行提示符（说明登录成功）
+        child.expect(r"[$#>]")
+        print(f"✅ 成功登录 {user}@{host}")
+        print("💡 提示：输入命令交互，输入 exit 退出\n")
+
+        # 进入完全交互模式：本地输入直接发送，远程输出直接打印
+        child.interact()
+
+    except pexpect.TIMEOUT:
+        print("❌ 连接超时！")
+    except pexpect.EOF:
+        print("❌ 连接断开或认证失败！")
+    finally:
+        child.close()
+
+
+def ssh_exec_command(
+        host: str,
+        port: int = 22,
+        username: str = "",
+        password: str = "",
+        command: str = "",
+        timeout: int = 15
+) -> ShellResult:
+    """
+    Python 跨平台非交互式SSH执行远程命令【Windows/Linux/Mac全兼容】
+    :param host: 远程服务器IP/域名
+    :param port: SSH端口
+    :param username: 登录用户名
+    :param password: 登录密码
+    :param command: 要执行的远程命令(非交互式)
+    :param timeout: 连接超时时间
+    :return: dict 格式化结果: {'success':布尔, 'stdout':标准输出, 'stderr':错误输出, 'msg':描述信息}
+    """
+    # 初始化返回结果
+    result = {
+        "success": False,
+        "stdout": "",
+        "stderr": "",
+        "msg": ""
+    }
+    ssh_client = paramiko.SSHClient()
+    # 自动接受远程主机密钥，避免首次连接报错
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    try:
+        # 建立SSH连接，跨平台通用配置
+        ssh_client.connect(
+            hostname=host,
+            port=port,
+            username=username,
+            password=password,
+            timeout=timeout,
+            look_for_keys=False,  # 关闭密钥登录，纯密码登录，Windows无坑
+            allow_agent=False,  # 关闭SSH代理，Windows/Linux通用
+            banner_timeout=timeout * 2
+        )
+
+        # ========== 核心：非交互式执行命令 核心方法 ==========
+        # exec_command 是paramiko非交互SSH的官方标准方法，无任何兼容问题
+        stdin, stdout, stderr = ssh_client.exec_command(command)
+        # 等待命令执行完成，获取返回码
+        exit_code = stdout.channel.recv_exit_status()
+
+        # 读取标准输出和错误输出，统一解码+处理中文乱码
+        stdout_content = stdout.read().decode("utf-8", errors="ignore").strip()
+        stderr_content = stderr.read().decode("utf-8", errors="ignore").strip()
+
+        # 封装执行结果
+        if exit_code == 0:
+            result["success"] = True
+            result["stdout"] = stdout_content
+            result["msg"] = f"命令执行成功: {command}"
+        else:
+            result["stderr"] = stderr_content
+            result["msg"] = f"命令执行失败(返回码:{exit_code}): {command}"
+
+    except paramiko.AuthenticationException:
+        result["msg"] = f"❌ 认证失败：用户名或密码错误"
+    except paramiko.SSHException as e:
+        result["msg"] = f"❌ SSH协议异常：{str(e)} (服务器SSH服务未启动/连接被断开)"
+    except Exception as e:
+        result["msg"] = f"❌ 执行异常：{str(e)}"
+    finally:
+        # 安全关闭连接，无论成败都执行
+        try:
+            if ssh_client.get_transport() and ssh_client.get_transport().is_active():
+                ssh_client.close()
+        except:
+            pass
+    return ShellResult(**result)

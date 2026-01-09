@@ -40,6 +40,19 @@ class NginxBlsMachine:
 
 
 @dataclass
+class NginxBlsWeight:
+    """
+    nginx 负载项
+    """
+    id: int = field(default_factory=lambda: -1)
+    name: str = field(default_factory=lambda: None)
+    # bls_machine 外键
+    bls_machine_id: int = field(default_factory=lambda : -1)
+    command_config_path: str = field(default_factory=lambda : None)
+    status: str = field(default_factory=lambda : None)
+
+
+@dataclass
 class ContainerPods:
     """
     服务容器主机
@@ -54,6 +67,20 @@ class ContainerPods:
     images_name: str = field(default_factory=lambda : None)
     status: str = field(default_factory=lambda : None)
 
+
+@dataclass
+class ContainerPodsVersion:
+    """
+    服务容器版本
+    """
+    id: int = field(default_factory=lambda: -1)
+    name: str = field(default_factory=lambda: None)
+    # ServerMachine 外键
+    server_id: int = field(default_factory=lambda: -1)
+    pods_id: int = field(default_factory=lambda: -1)
+    command_path: str = field(default_factory=lambda: None)
+    images_id: str = field(default_factory=lambda : None)
+    images_name: str = field(default_factory=lambda : None)
 
 @dataclass
 class ImagesInfos:
