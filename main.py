@@ -12,7 +12,7 @@ from starlette.responses import JSONResponse
 from setting import settings
 from logconfig import setup_rotating_log
 from web import resp_fail
-from web.api import hub_docker_api, hub_docker_registry_api
+from web.api import hub_docker_api, hub_docker_registry_api, auth_api
 from data.asyncl import mysql_data, mysql_orm
 
 
@@ -46,6 +46,7 @@ mysql_orm.mysql_orm.setup(app)
 # 路由
 app.include_router(hub_docker_api.router, prefix='/api/hub/docker/machine', tags=['hub-docker-machine'])
 app.include_router(hub_docker_registry_api.router, prefix='/api/hub/docker/registry', tags=['hub-docker-registry'])
+app.include_router(auth_api.router, tags=['auth'])
 
 
 # ============ 2. 集成全局异常捕获 ============

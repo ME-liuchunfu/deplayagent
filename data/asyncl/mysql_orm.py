@@ -28,4 +28,13 @@ class DockerServer(Base):
     passwd = Column(String(128), index=False, nullable=False)
 
 
+class DbAuthUser(Base):
+    __tablename__ = 'db_auth_user'
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    nickname = Column(String(128), index=False, nullable=False)
+    username = Column(String(50), index=True, nullable=False)
+    passwd = Column(String(128), index=False, nullable=False)
+    status = Column(Integer, index=False, nullable=False)
+
+
 mysql_orm = MySQLORM()

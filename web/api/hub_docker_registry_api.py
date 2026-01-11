@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from data.asyncl.mysql_data import init_setup
 from data.asyncl.mysql_orm import DockerServer
 from hub.docker_registry import DockerRegistryClient
+from utils.jwt_auth import get_current_user
 from web import resp_fail, resp_ok
 
 
@@ -25,7 +26,11 @@ async def query_hub(hub_id: int, db: AsyncSession) -> Optional[DockerServer]:
 
 
 @router.get("/repositories/all/{hub_id}")
-async def all_repositories(hub_id: int, db: AsyncSession = Depends(init_setup.get_async_db)):
+async def all_repositories(
+    hub_id: int,
+    db: AsyncSession = Depends(init_setup.get_async_db),
+    current_user: dict = Depends(get_current_user)
+):
     data = await query_hub(hub_id, db)
     domain = data.domain
     if domain.endswith('/'):
@@ -78,7 +83,11 @@ async def all_repositories(hub_id: int, db: AsyncSession = Depends(init_setup.ge
 
 
 @router.get("/repositories/query/{hub_id}")
-async def all_repositories(hub_id: int, db: AsyncSession = Depends(init_setup.get_async_db)):
+async def all_repositories(
+    hub_id: int,
+    db: AsyncSession = Depends(init_setup.get_async_db),
+    current_user: dict = Depends(get_current_user)
+):
     data = await query_hub(hub_id, db)
     domain = data.domain
     if domain.endswith('/'):
@@ -93,7 +102,12 @@ async def all_repositories(hub_id: int, db: AsyncSession = Depends(init_setup.ge
 
 
 @router.get("/repositories/tags/{hub_id}")
-async def tags_repo(hub_id: int, repo: str, db: AsyncSession = Depends(init_setup.get_async_db)):
+async def tags_repo(
+    hub_id: int,
+    repo: str,
+    db: AsyncSession = Depends(init_setup.get_async_db),
+    current_user: dict = Depends(get_current_user)
+):
     if repo is None:
         return resp_fail(msg='缺失仓库')
     data = await query_hub(hub_id, db)

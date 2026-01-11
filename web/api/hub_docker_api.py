@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from data.asyncl.mysql_data import init_setup
 from data.asyncl.mysql_orm import DockerServer
+from utils.jwt_auth import get_current_user
 from web import resp_ok, resp_fail
 from sqlalchemy import select
 
@@ -31,7 +32,11 @@ class PutDockerServer(BaseModel):
 
 
 @router.get("/list")
-async def list(query: ListQuery = Depends(), db: AsyncSession = Depends(init_setup.get_async_db)):
+async def list(
+    query: ListQuery = Depends(),
+    db: AsyncSession = Depends(init_setup.get_async_db),
+    current_user: dict = Depends(get_current_user)
+):
     sql = select(DockerServer)
     if query.name:
          sql.filter(DockerServer.name.like(f'{query.name}%'))
@@ -43,7 +48,11 @@ async def list(query: ListQuery = Depends(), db: AsyncSession = Depends(init_set
 
 
 @router.get("/get/{id}")
-async def get(id: int, db: AsyncSession = Depends(init_setup.get_async_db)):
+async def get(
+    id: int,
+    db: AsyncSession = Depends(init_setup.get_async_db),
+    current_user: dict = Depends(get_current_user)
+):
     sql = select(DockerServer).filter(DockerServer.id == id)
     qb = await db.execute(sql)
     row = qb.scalar_one_or_none()
@@ -51,7 +60,11 @@ async def get(id: int, db: AsyncSession = Depends(init_setup.get_async_db)):
 
 
 @router.post("/add")
-async def add(data: AddDockerServer, db: AsyncSession = Depends(init_setup.get_async_db)):
+async def add(
+    data: AddDockerServer,
+    db: AsyncSession = Depends(init_setup.get_async_db),
+    current_user: dict = Depends(get_current_user)
+):
     sql = select(DockerServer).filter(DockerServer.name == data.name)
     qb = await db.execute(sql)
     rows = qb.all()
@@ -65,7 +78,11 @@ async def add(data: AddDockerServer, db: AsyncSession = Depends(init_setup.get_a
 
 
 @router.post("/put")
-async def put(data: PutDockerServer, db: AsyncSession = Depends(init_setup.get_async_db)):
+async def put(
+    data: PutDockerServer,
+    db: AsyncSession = Depends(init_setup.get_async_db),
+    current_user: dict = Depends(get_current_user)
+):
     if data.id is None:
         return resp_fail(msg='缺失id')
     sql = select(DockerServer).filter(DockerServer.id == data.id)
@@ -83,7 +100,11 @@ async def put(data: PutDockerServer, db: AsyncSession = Depends(init_setup.get_a
 
 
 @router.post("/del")
-async def delete(data: List[int], db: AsyncSession = Depends(init_setup.get_async_db)):
+async def delete(
+    data: List[int],
+    db: AsyncSession = Depends(init_setup.get_async_db),
+    current_user: dict = Depends(get_current_user)
+):
     if data is None or len(data) == 0:
         return resp_fail(msg='缺失id')
     sql = select(DockerServer).filter(DockerServer.id.in_(data))
