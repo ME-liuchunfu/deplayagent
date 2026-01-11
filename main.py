@@ -12,8 +12,9 @@ from starlette.responses import JSONResponse
 from setting import settings
 from logconfig import setup_rotating_log
 from web import resp_fail
-from web.api import hub_docker_api
+from web.api import hub_docker_api, hub_docker_registry_api
 from data.asyncl import mysql_data, mysql_orm
+
 
 log_dir = "../deplayagent-logs"
 if not os.path.exists(log_dir):
@@ -44,6 +45,8 @@ mysql_orm.mysql_orm.setup(app)
 
 # 路由
 app.include_router(hub_docker_api.router, prefix='/api/hub/docker/machine', tags=['hub-docker-machine'])
+app.include_router(hub_docker_registry_api.router, prefix='/api/hub/docker/registry', tags=['hub-docker-registry'])
+
 
 # ============ 2. 集成全局异常捕获 ============
 @app.exception_handler(RequestValidationError)
