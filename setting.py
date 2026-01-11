@@ -10,9 +10,11 @@ dotenv_dict = dotenv_values(env_name)
 class DataBaseSettings:
     database_host: Optional[str] = field(default_factory=lambda: None)
     database_user: Optional[str] = field(default_factory=lambda: None)
+    database_port: Optional[int] = field(default_factory=lambda: 3306)
     database_passwd: Optional[str] = field(default_factory=lambda: None)
     database_dbname: Optional[str] = field(default_factory=lambda: None)
     database_charset: Optional[str] = field(default_factory=lambda: None)
+    database_param: Optional[str] = field(default_factory=lambda: None)
 
 @dataclass
 class HubRegistrySetting:
