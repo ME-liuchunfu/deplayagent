@@ -3,16 +3,28 @@ from typing import Optional
 from dataclasses import dataclass, field
 from dotenv import load_dotenv, dotenv_values
 from application_config import app_env as env_name
+import secrets
 
 dotenv_dict = dotenv_values(env_name)
+
+
+# ========== JWT核心配置 ==========
+# 密钥：生产环境建议用secrets生成随机密钥，不要写死！
+SECRET_KEY = secrets.token_hex(32)  # 生成32位随机密钥，绝对安全
+# 加密算法，固定用HS256即可
+ALGORITHM = "HS256"
+# Token过期时间：单位 分钟，这里配置2小时 = 120分钟
+ACCESS_TOKEN_EXPIRE_MINUTES = 120
 
 @dataclass
 class DataBaseSettings:
     database_host: Optional[str] = field(default_factory=lambda: None)
     database_user: Optional[str] = field(default_factory=lambda: None)
+    database_port: Optional[int] = field(default_factory=lambda: 3306)
     database_passwd: Optional[str] = field(default_factory=lambda: None)
     database_dbname: Optional[str] = field(default_factory=lambda: None)
     database_charset: Optional[str] = field(default_factory=lambda: None)
+    database_param: Optional[str] = field(default_factory=lambda: None)
 
 @dataclass
 class HubRegistrySetting:
