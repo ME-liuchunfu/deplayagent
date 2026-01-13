@@ -1,0 +1,99 @@
+/* 基础样式重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f8f9fa;
+    color: #333;
+    font-size: 0.16rem; /* 16px */
+}
+
+html {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    -webkit-user-select: none; /* Safari/Chrome/iOS */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE/Edge */
+    user-select: none; /* 标准属性 */
+}
+
+#app {
+    height: 100vh;
+    background-color: #f8f9fa;
+    overflow: hidden;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%;
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+.el-menu {
+    border-right: none !important;
+}
+
+.el-menu-item {
+    font-size: 0.16rem !important;
+    height: 0.5rem !important; /* 50px */
+    line-height: 0.5rem !important;
+}
+
+.el-icon {
+    font-size: 0.2rem !important; /* 20px */
+}
+
+/* 通用样式（Rem 单位） */
+.container {
+    width: 100%;
+    min-height: calc(100vh - 0.6rem); /* 减去底部导航高度 0.6rem=60px */
+    padding: 0.15rem; /* 15px */
+}
+
+.page-title {
+    font-size: 0.2rem !important; /* 20px */
+    font-weight: 600;
+    margin-bottom: 0.25rem; /* 25px */
+    color: #333;
+    text-align: left;
+}
+
+/* 自定义组件样式 */
+.custom-cell {
+    display: flex;
+    align-items: center;
+    padding: 0.12rem 0; /* 12px */
+    border-bottom: 0.01rem solid #f0f0f0; /* 1px */
+    font-size: 0.16rem;
+}
+
+.custom-cell__label {
+    width: 0.75rem; /* 75px */
+    color: #666;
+}
+
+.custom-cell__value {
+    flex: 1;
+    color: #333;
+    text-align: right;
+}
+
+.custom-cell__arrow {
+    color: #c0c4cc;
+    margin-left: 0.05rem; /* 5px */
+}
+
+
+.flex-full {
+    flex: 1;
+}

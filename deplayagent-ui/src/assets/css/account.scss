@@ -1,0 +1,27 @@
+
+:deep(.el-button) {
+    border-radius: 0.225rem !important;
+    height: 0.45rem !important;
+    line-height: 0.45rem !important;
+    font-size: 0.16rem !important;
+    padding: 0 !important;
+}
+
+:deep(.el-input__wrapper) {
+    border-radius: 0.225rem !important;
+    height: 0.45rem !important;
+    font-size: 0.16rem !important;
+}
+
+:deep(.el-input__inner) {
+    height: 0.45rem !important;
+    line-height: 0.45rem !important;
+    font-size: 0.16rem !important;
+    padding: 0 0.15rem !important;
+}
+
+:deep(.el-card) {
+    border-radius: 0.1rem !important;
+    border: none !important;
+    box-shadow: 0 0.02rem 0.12rem rgba(0, 0, 0, 0.05) !important;
+}
