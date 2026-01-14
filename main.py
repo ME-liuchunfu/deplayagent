@@ -9,11 +9,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import JSONResponse
+
+from application_config import app_port
+from data.asyncl.mysql_data import init_setup
+from data.asyncl.mysql_orm import Base
 from setting import settings
 from logconfig import setup_rotating_log
+from task.qagent_container_task import sync_qagent_container
 from web import resp_fail
-from web.api import hub_docker_api, hub_docker_registry_api, auth_api
+from web.api import (hub_docker_api, hub_docker_registry_api,
+                     auth_api, qagent_server_api, qagent_server_client_api,
+                    qagent_server_container_api
+                     )
 from data.asyncl import mysql_data, mysql_orm
+from task import schedule_task
 
 
 log_dir = "../deplayagent-logs"
@@ -23,12 +32,27 @@ if not os.path.exists(log_dir):
 setup_rotating_log(log_file="../deplayagent-logs/app.log")
 logger = logging.getLogger(__name__)
 
+
+async def lifespan(app: FastAPI):
+    async_engine = init_setup.async_engine
+    async with async_engine.begin() as conn:
+        # 可选：删除所有表（开发阶段测试用）
+        # await conn.run_sync(Base.metadata.drop_all)
+        # 创建所有表
+        await conn.run_sync(Base.metadata.create_all)
+    schedule_task.start()
+    sync_qagent_container()
+    yield
+    logger.info("✅ FastAPI服务关闭，后台定时任务线程已停止")
+
+
 app = FastAPI(
         title="deplayagent",
         description="",
         version="1.0.0",
         docs_url="/docs",
-        redoc_url="/redoc"
+        redoc_url="/redoc",
+        lifespan=lifespan
     )
 
 app.add_middleware(
@@ -40,13 +64,15 @@ app.add_middleware(
 )
 
 mysql_data.init_setup.setup_mysql(db_config=settings.database)
-mysql_orm.mysql_orm.setup(app)
 
 
 # 路由
 app.include_router(hub_docker_api.router, prefix='/api/hub/docker/machine', tags=['hub-docker-machine'])
 app.include_router(hub_docker_registry_api.router, prefix='/api/hub/docker/registry', tags=['hub-docker-registry'])
-app.include_router(auth_api.router, tags=['auth'])
+app.include_router(auth_api.router, prefix="/api/auth", tags=['auth'])
+app.include_router(qagent_server_api.router, prefix="/api/qagent/server", tags=['QAgentServer'])
+app.include_router(qagent_server_client_api.router, prefix="/api/qagent/server_client", tags=['QAgentServer client'])
+app.include_router(qagent_server_container_api.router, prefix="/api/qagent/server_container", tags=['QAgentServer container'])
 
 
 # ============ 2. 集成全局异常捕获 ============
@@ -72,4 +98,4 @@ async def global_exception_handler(request: Request, exc: Exception):
 if __name__ == '__main__':
     import uvicorn
     # uvicorn.run("文件名称:app实例", 主机, 端口, 是否热重载)
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=app_port, reload=False)

@@ -1,89 +1,48 @@
 import logging
-from logging.handlers import RotatingFileHandler
-import os
-import time
-from datetime import datetime, timedelta
+import logging.handlers
 
-def setup_rotating_log(
-    log_file="app.log",  # 日志文件名前缀
-    max_size=100 * 1024 * 1024,  # 单个文件最大100MB（字节）
-    backup_count=30,  # 最大备份文件数（防止文件过多，配合7天清理）
-    keep_days=7,  # 保留最近7天的日志
-    log_level=logging.INFO  # 日志级别
-):
-    """
-    配置按大小滚动（100MB/文件）+ 按时间清理（7天）的日志
-    """
-    # 1. 创建日志器（logger）
+
+# ===================== 日志核心配置 =====================
+def setup_rotating_log(log_file = "app.log", encoding='utf-8', backupCount=7):
+    # 1. 定义日志根对象
     logger = logging.getLogger()
-    logger.setLevel(log_level)  # 全局日志级别
-    logger.handlers.clear()  # 清除默认处理器（避免重复输出）
+    logger.setLevel(logging.INFO)  # 日志总级别：DEBUG/INFO/WARNING/ERROR/CRITICAL
+    logger.handlers.clear()  # 清空默认handler，防止重复打印日志
 
-    # 2. 定义日志格式（包含时间、级别、模块、信息）
-    formatter = logging.Formatter(
-        fmt="%(asctime)s - %(levelname)s - %(module)s:%(lineno)d - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
+    # 2. 定义日志格式（可根据需求修改）
+    # 格式说明：时间 - 日志级别 - 模块名 - 行号 - 日志内容
+    log_formatter = logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(module)s:%(lineno)d - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S"  # 时间格式美化
     )
 
-    # 3. 配置按大小滚动的文件处理器（RotatingFileHandler）
-    # 当文件超过 max_size 时，自动创建新文件（命名格式：app.log.1, app.log.2...）
-    file_handler = RotatingFileHandler(
-        filename=log_file,
-        maxBytes=max_size,
-        backupCount=backup_count,
-        encoding="utf-8",  # 支持中文
-        delay=False  # 立即创建文件
+    # 3. 关键：配置【按天滚动+保留7天】的文件处理器
+    # 日志主文件名称
+    # TimedRotatingFileHandler 核心参数说明
+    file_handler = logging.handlers.TimedRotatingFileHandler(
+        filename=log_file,          # 日志主文件路径/名称
+        when='midnight',            # 滚动时机：【每天凌晨0点】切割日志
+        interval=1,                 # 滚动间隔：1个when单位 → 1天
+        backupCount=backupCount,    # 保留日志文件的数量 → 保留7天
+        encoding=encoding,          # 解决中文乱码问题
+        delay=False,                # 立即创建日志文件
+        utc=False                   # 使用【本地时间】而非UTC时间
     )
-    file_handler.setFormatter(formatter)
+    # 切割后的日志文件，文件名后缀添加【日期】而非默认数字（必加，可读性极高）
+    file_handler.suffix = "%Y-%m-%d"
+    # 过滤掉默认的数字后缀日志文件（只保留日期后缀）
+    file_handler.extMatch = r"^\d{4}-\d{2}-\d{2}$"
+
+    # 4. 配置控制台输出（可选，开发调试用，生产可注释）
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+
+    # 5. 给处理器绑定日志格式
+    file_handler.setFormatter(log_formatter)
+    console_handler.setFormatter(log_formatter)
+
+    # 6. 把处理器添加到日志对象
     logger.addHandler(file_handler)
-
-    # 4. 配置控制台输出（可选，方便调试）
-    dev_env = os.getenv('DEV_ENV')
-    if dev_env is not None:
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
-
-    # 5. 清理超过 keep_days 的过期日志文件
-    def clean_expired_logs():
-        log_dir = os.path.dirname(os.path.abspath(log_file))  # 日志文件所在目录
-        log_prefix = os.path.basename(log_file)  # 日志前缀（如 app.log）
-        now = time.time()
-
-        for filename in os.listdir(log_dir):
-            # 匹配日志文件（包括主文件 app.log 和备份文件 app.log.1, app.log.2...）
-            if filename.startswith(log_prefix):
-                file_path = os.path.join(log_dir, filename)
-                # 获取文件最后修改时间
-                file_mtime = os.path.getmtime(file_path)
-                # 计算文件是否过期（当前时间 - 文件修改时间 > keep_days 天）
-                if now - file_mtime > keep_days * 24 * 3600:
-                    try:
-                        os.remove(file_path)
-                        logger.info(f"已删除过期日志：{filename}")
-                    except Exception as e:
-                        logger.error(f"删除过期日志失败：{filename}，错误：{e}")
-
-    # 6. 首次运行时清理一次过期日志
-    clean_expired_logs()
+    logger.addHandler(console_handler)
 
     return logger
-
-# ------------------------------
-# 使用示例
-# ------------------------------
-if __name__ == "__main__":
-    # 初始化日志配置
-    logger = setup_rotating_log(
-        log_file="logs/app.log",  # 日志存储在 logs 目录（自动创建，需确保权限）
-        max_size=100 * 1024 * 1024,  # 100MB/文件
-        backup_count=30,  # 最多保留30个备份文件（防止极端情况下文件过多）
-        keep_days=7  # 保留7天
-    )
-
-    # 测试日志输出
-    logger.debug("调试信息（默认不输出，需将 log_level 设为 DEBUG）")
-    logger.info("普通信息日志")
-    logger.warning("警告日志")
-    logger.error("错误日志")
-    logger.critical("严重错误日志")

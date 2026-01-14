@@ -11,7 +11,7 @@ from utils.jwt_auth import verify_password, create_access_token
 from setting import ACCESS_TOKEN_EXPIRE_MINUTES
 from web import resp_ok
 
-router = APIRouter(prefix="/api/auth", tags=["用户认证"])
+router = APIRouter(tags=["用户认证"])
 
 
 class Token(BaseModel):

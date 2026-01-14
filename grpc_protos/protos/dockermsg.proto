@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package dockermsg;
+
+// 协议端
+
+message Req_DockerImages {
+    string name = 1;
+}
+
+message Rsp_DockerImages {
+    int32 code = 1;
+    string msg = 2;
+    repeated Pro_DockerImages images = 3;
+}
+
+message Pro_DockerImages {
+    string repository = 1;
+    string tag = 2;
+    string image_id = 3;
+    string created = 4;
+    string size = 5;
+}
+
+
+message Req_DockerPull {
+    string repo_tag = 1;
+    string login_url = 2;
+    string username = 3;
+    string password = 4;
+}
+
+message Rsp_DockerPull {
+    int32 code = 1;
+    string msg = 2;
+}
+
+// 实例
+
+message Req_DockerUp {
+    string container_id = 1;
+    string container_name = 2;
+    string work_path = 3;
+}
+
+message Rsp_DockerUp {
+    int32 code = 1;
+    string msg = 2;
+}
+
+message Req_DockerDown {
+    string container_id = 1;
+    string container_name = 2;
+    string work_path = 3;
+}
+
+message Rsp_DockerDown {
+    int32 code = 1;
+    string msg = 2;
+}
+
+message Req_DockerRestart {
+    string container_id = 1;
+    string container_name = 2;
+    string work_path = 3;
+}
+
+message Rsp_DockerRestart {
+    int32 code = 1;
+    string msg = 2;
+}
+
+message Req_DockerRollBack {
+    string container_id = 1;
+    string container_name = 2;
+    string work_path = 3;
+    string images_name = 4;
+}
+
+message Rsp_DockerRollBack {
+    int32 code = 1;
+    string msg = 2;
+}
+
+message Req_DockerInfo {
+    string container_id = 1;
+    string container_name = 2;
+    string work_path = 3;
+}
+
+message Rsp_DockerInfo {
+    int32 code = 1;
+    string msg = 2;
+    repeated Pro_DockerInfo infos = 3;
+}
+
+message Pro_DockerInfo {
+    string command = 1;
+    string created_at = 2;
+    string id = 3;
+    string image = 4;
+    string names = 5;
+    string labels = 6;
+    string ports = 7;
+    string running_for = 8;
+    string state = 9;
+    string status = 10;
+    string size = 11;
+}
+
+// 服务端
+
+service DockerAgent {
+    rpc images (Req_DockerImages) returns (Rsp_DockerImages);
+
+    rpc pull_images (Req_DockerPull) returns (Rsp_DockerPull);
+
+    rpc container_up (Req_DockerUp) returns (Rsp_DockerUp);
+
+    rpc container_down (Req_DockerDown) returns (Rsp_DockerDown);
+
+    rpc container_restart (Req_DockerRestart) returns (Rsp_DockerRestart);
+
+    rpc container_rollback (Req_DockerRollBack) returns (Rsp_DockerRollBack);
+
+    rpc container_info (Req_DockerInfo) returns (Rsp_DockerInfo);
+
+}
