@@ -5,9 +5,6 @@ const dynamicRouter = [
         path: '/home',
         name: 'HomeView',
         component: ()=>import("@/views/layout/HomeView.vue"),
-        meta: {
-            ignore: true
-        }
     },
     {
         path: '/:pathMatch(.*)*',

@@ -2,7 +2,6 @@
 import time
 
 from fastapi import APIRouter, Depends, HTTPException, Body
-from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from data.asyncl.mysql_data import init_setup
@@ -10,6 +9,8 @@ from data.asyncl.mysql_orm import DbAuthUser
 from utils.jwt_auth import verify_password, create_access_token
 from setting import ACCESS_TOKEN_EXPIRE_MINUTES
 from web import resp_ok
+from pydantic import BaseModel, Field
+
 
 router = APIRouter(tags=["用户认证"])
 
@@ -22,7 +23,7 @@ class Token(BaseModel):
 
 
 class UserLogin(BaseModel):
-    username: str
+    username: str = Field(..., alias="userName", description="用户名")
     password: str
 
 

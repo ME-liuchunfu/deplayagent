@@ -11,7 +11,7 @@ body {
     -moz-osx-font-smoothing: grayscale;
     background-color: #f8f9fa;
     color: #333;
-    font-size: 0.16rem; /* 16px */
+    font-size: 16px; /* 16px */
 }
 
 html {
@@ -44,26 +44,26 @@ html {
 }
 
 .el-menu-item {
-    font-size: 0.16rem !important;
-    height: 0.5rem !important; /* 50px */
-    line-height: 0.5rem !important;
+    font-size: 16px !important;
+    height: 50px !important; /* 50px */
+    line-height: 50px !important;
 }
 
 .el-icon {
-    font-size: 0.2rem !important; /* 20px */
+    font-size: 20px !important; /* 20px */
 }
 
 /* 通用样式（Rem 单位） */
 .container {
     width: 100%;
-    min-height: calc(100vh - 0.6rem); /* 减去底部导航高度 0.6rem=60px */
-    padding: 0.15rem; /* 15px */
+    min-height: calc(100vh - 60px); /* 减去底部导航高度 0.6px=60px */
+    padding: 15px; /* 15px */
 }
 
 .page-title {
-    font-size: 0.2rem !important; /* 20px */
+    font-size: 20px !important; /* 20px */
     font-weight: 600;
-    margin-bottom: 0.25rem; /* 25px */
+    margin-bottom: 25px; /* 25px */
     color: #333;
     text-align: left;
 }
@@ -72,13 +72,13 @@ html {
 .custom-cell {
     display: flex;
     align-items: center;
-    padding: 0.12rem 0; /* 12px */
-    border-bottom: 0.01rem solid #f0f0f0; /* 1px */
-    font-size: 0.16rem;
+    padding: 12px 0; /* 12px */
+    border-bottom: 1px solid #f0f0f0; /* 1px */
+    font-size: 16px;
 }
 
 .custom-cell__label {
-    width: 0.75rem; /* 75px */
+    width: 75px; /* 75px */
     color: #666;
 }
 
@@ -90,7 +90,7 @@ html {
 
 .custom-cell__arrow {
     color: #c0c4cc;
-    margin-left: 0.05rem; /* 5px */
+    margin-left: 5px; /* 5px */
 }
 
 

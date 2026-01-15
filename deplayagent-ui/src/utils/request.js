@@ -20,9 +20,7 @@ service.interceptors.request.use(
     (config) => {
         let token = cacheInfo.token();
         if (token) {
-            const tokenValue = token['tokenValue'];
-            const tokenName = token['tokenName'];
-            config.headers[tokenName] = tokenValue
+            config.headers['Authorization'] = `${token.token_type} ${token.access_token}`
         }
         return config
     },

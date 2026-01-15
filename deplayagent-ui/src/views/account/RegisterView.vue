@@ -183,7 +183,7 @@ const handleLogin = async () => {
 </script>
 
 <style scoped lang="scss">
-@import "@/assets/css/account.scss";
+@use "@/assets/css/account.scss";
 /* 固定容器高度 100% */
 .login-page {
     width: 100%;

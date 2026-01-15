@@ -121,10 +121,18 @@ const handleLogin = async () => {
             readme: false,
             ac: "ac"
         });
+        console.log(res)
         isLoading.value = false
-        if (res && res['tokenName']) {
+        /*
+        access_token
+          expires_minutes
+          now
+          token_type
+          "bearer"
+         */
+        if (res && res['access_token']) {
             ElMessage.success('登录成功，欢迎回来～')
-            cacheInfo.setLogin({'tokenValue': res['tokenValue'], 'tokenName': res['tokenName']})
+            cacheInfo.setLogin(res)
             router.push('/home')
         }
     } catch (error) {
@@ -135,7 +143,7 @@ const handleLogin = async () => {
 </script>
 
 <style scoped lang="scss">
-@import "@/assets/css/account.scss";
+@use "@/assets/css/account.scss";
 
 /* 固定容器高度 100% */
 .login-page {
@@ -146,40 +154,40 @@ const handleLogin = async () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.25rem 0.15rem; /* 25px 15px */
+    padding: 25px 15px; /* 25px 15px */
     overflow: hidden;
 }
 
 /* 背景装饰（Rem 尺寸） */
 .bg-decoration {
     position: absolute;
-    width: 3rem; /* 300px */
-    height: 3rem;
+    width: 300px; /* 300px */
+    height: 300px;
     border-radius: 50%;
     opacity: 0.15;
     z-index: 0;
 }
 
 .top-left {
-    top: -1rem; /* -100px */
-    left: -1rem;
+    top: -100px; /* -100px */
+    left: -100px;
     background: linear-gradient(135deg, #409eff, #69b1ff);
 }
 
 .bottom-right {
-    bottom: -1rem;
-    right: -1rem;
+    bottom: -100px;
+    right: -100px;
     background: linear-gradient(135deg, #722ed1, #9370db);
 }
 
 /* 登录卡片（Rem 尺寸） */
 .login-card {
     width: 100%;
-    max-width: 3.45rem; /* 345px */
+    max-width: 34500px; /* 345px */
     background-color: #fff;
-    border-radius: 0.2rem; /* 20px */
-    box-shadow: 0 0.1rem 0.3rem rgba(0, 0, 0, 0.08);
-    padding: 0.4rem 0.3rem; /* 40px 30px */
+    border-radius: 20px; /* 20px */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    padding: 40px 3px; /* 40px 30px */
     position: relative;
     z-index: 1;
     transform: translateY(0);
@@ -187,42 +195,42 @@ const handleLogin = async () => {
 }
 
 .login-card:hover {
-    box-shadow: 0 0.15rem 0.35rem rgba(0, 0, 0, 0.12);
-    transform: translateY(-0.05rem); /* -5px */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    transform: translateY(-5px); /* -5px */
 }
 
 /* 登录头部 */
 .login-header {
     text-align: center;
-    margin-bottom: 0.4rem; /* 40px */
+    margin-bottom: 40px; /* 40px */
 }
 
 .login-logo {
-    width: 0.8rem; /* 80px */
-    height: 0.8rem;
+    width: 80px; /* 80px */
+    height: 80px;
     background: linear-gradient(135deg, #409eff, #722ed1);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 0.2rem; /* 20px */
-    box-shadow: 0 0.04rem 0.15rem rgba(64, 158, 255, 0.3);
+    margin: 0 auto 20px; /* 20px */
+    box-shadow: 0 4px 15px rgba(64, 158, 255, 0.3);
 }
 
 .logo-icon {
-    font-size: 0.4rem !important; /* 40px */
+    font-size: 40px !important; /* 40px */
     color: #fff;
 }
 
 .login-title {
-    font-size: 0.24rem; /* 24px */
+    font-size: 24px; /* 24px */
     font-weight: 600;
     color: #1d2129;
-    margin-bottom: 0.08rem; /* 8px */
+    margin-bottom: 8px; /* 8px */
 }
 
 .login-desc {
-    font-size: 0.14rem; /* 14px */
+    font-size: 14px; /* 14px */
     color: #86909c;
 }
 
@@ -232,26 +240,26 @@ const handleLogin = async () => {
 }
 
 .form-item {
-    margin-bottom: 0.2rem; /* 20px */
+    margin-bottom: 20px; /* 20px */
 }
 
 .custom-input {
-    border-radius: 0.225rem !important; /* 22.5px */
-    height: 0.45rem !important; /* 45px */
-    font-size: 0.16rem !important; /* 16px */
-    border: 0.01rem solid #e5e6eb !important; /* 1px */
+    border-radius: 22.5px !important; /* 22.5px */
+    height: 45px !important; /* 45px */
+    font-size: 16px !important; /* 16px */
+    border: 1px solid #e5e6eb !important; /* 1px */
     transition: all 0.3s ease;
 }
 
 .custom-input:focus-within {
     border-color: #409eff !important;
-    box-shadow: 0 0 0 0.02rem rgba(64, 158, 255, 0.15) !important; /* 2px */
+    box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.15) !important; /* 2px */
 }
 
 .el-input__prefix {
     color: #86909c !important;
-    font-size: 0.2rem !important; /* 20px */
-    margin-right: 0.1rem !important; /* 10px */
+    font-size: 20px !important; /* 20px */
+    margin-right: 10px !important; /* 10px */
 }
 
 .custom-input:focus-within .el-input__prefix {
@@ -262,17 +270,17 @@ const handleLogin = async () => {
 .login-btn {
     background: linear-gradient(135deg, #409eff, #69b1ff) !important;
     border: none !important;
-    height: 0.5rem !important; /* 50px */
-    font-size: 0.17rem !important; /* 17px */
+    height: 50px !important; /* 50px */
+    font-size: 17px !important; /* 17px */
     font-weight: 500 !important;
-    border-radius: 0.25rem !important; /* 25px */
+    border-radius: 25px !important; /* 25px */
     transition: all 0.3s ease;
-    box-shadow: 0 0.04rem 0.12rem rgba(64, 158, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(64, 158, 255, 0.2);
 }
 
 .login-btn:hover {
     background: linear-gradient(135deg, #3689e6, #5ba0ff) !important;
-    box-shadow: 0 0.06rem 0.16rem rgba(64, 158, 255, 0.25);
+    box-shadow: 0 6px 16px rgba(64, 158, 255, 0.25);
 }
 
 .login-btn:active {
@@ -283,12 +291,12 @@ const handleLogin = async () => {
 .login-links {
     display: flex;
     justify-content: space-between;
-    margin-top: 0.15rem; /* 15px */
-    margin-bottom: 0.4rem; /* 40px */
+    margin-top: 15px; /* 15px */
+    margin-bottom: 40px; /* 40px */
 }
 
 .link-item {
-    font-size: 0.14rem; /* 14px */
+    font-size: 14px; /* 14px */
     color: #409eff;
     text-decoration: none;
     transition: color 0.3s ease;
@@ -302,13 +310,13 @@ const handleLogin = async () => {
 /* 游客登录 */
 .guest-login {
     text-align: center;
-    margin-top: 0.25rem; /* 25px */
+    margin-top: 25px; /* 25px */
 }
 
 .guest-link {
     display: inline-flex;
     align-items: center;
-    font-size: 0.15rem; /* 15px */
+    font-size: 15px; /* 15px */
     color: #86909c;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -319,12 +327,12 @@ const handleLogin = async () => {
 }
 
 .guest-icon {
-    font-size: 0.16rem !important; /* 16px */
-    margin-left: 0.05rem; /* 5px */
+    font-size: 0.16px !important; /* 16px */
+    margin-left: 5px; /* 5px */
     transition: transform 0.3s ease;
 }
 
 .guest-link:hover .guest-icon {
-    transform: translateX(0.02rem); /* 2px */
+    transform: translateX(2px); /* 2px */
 }
 </style>

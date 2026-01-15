@@ -1,27 +1,27 @@
 
 :deep(.el-button) {
-    border-radius: 0.225rem !important;
-    height: 0.45rem !important;
-    line-height: 0.45rem !important;
-    font-size: 0.16rem !important;
+    border-radius: 22.5px !important;
+    height: 45px !important;
+    line-height: 45px !important;
+    font-size: 16px !important;
     padding: 0 !important;
 }
 
 :deep(.el-input__wrapper) {
-    border-radius: 0.225rem !important;
-    height: 0.45rem !important;
-    font-size: 0.16rem !important;
+    border-radius: 22.5px !important;
+    height: 45px !important;
+    font-size: 16px !important;
 }
 
 :deep(.el-input__inner) {
-    height: 0.45rem !important;
-    line-height: 0.45rem !important;
-    font-size: 0.16rem !important;
-    padding: 0 0.15rem !important;
+    height: 45px !important;
+    line-height: 45px !important;
+    font-size: 16px !important;
+    padding: 0 15px !important;
 }
 
 :deep(.el-card) {
-    border-radius: 0.1rem !important;
+    border-radius: 10px !important;
     border: none !important;
-    box-shadow: 0 0.02rem 0.12rem rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05) !important;
 }
