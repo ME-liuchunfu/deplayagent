@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-
+Server container
     </div>
 </template>
 

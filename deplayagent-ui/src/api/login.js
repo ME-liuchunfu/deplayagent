@@ -4,6 +4,7 @@ import request from '@/utils/request'
 export const authAPI = {
     // 登录
     login: (data) => request.post('/api/auth/login', data),
+    reflush: () => request.post('/api/auth/reflush'),
     // 注册
     register: (data) => request.post('/api/auth/register', data),
     // 更改密码

@@ -1,14 +1,22 @@
 <template>
-    <div class="aside-menu" :class="{'mini-menu': miniNav}">
+    <div class="aside-menu" :class="{'mini-menu': miniNav}" v-if="isLogin">
       <aside class="sidebar">
-          <el-menu default-active="/disk" class="sidebar-menu" @select="handleMenuSelect">
-              <el-menu-item index="/shared">
-                  <el-icon><ElIconShare /></el-icon>
-                  <span>云服务器</span>
+          <el-menu default-active="/home" class="sidebar-menu" @select="handleMenuSelect">
+              <el-menu-item index="/qagent/server">
+                  <el-icon><ElIconCloudy /></el-icon>
+                  <span>服务器引擎</span>
               </el-menu-item>
-              <el-menu-item index="/favorites">
-                  <el-icon><Star /></el-icon>
-                  <span>收藏夹</span>
+              <el-menu-item index="/qagent/server/container">
+                  <el-icon><ElIconCpu /></el-icon>
+                  <span>容器</span>
+              </el-menu-item>
+              <el-menu-item index="/docker/hub/images">
+                  <el-icon><ElIconBox /></el-icon>
+                  <span>镜像仓库</span>
+              </el-menu-item>
+              <el-menu-item index="/docker/hub/engine">
+                  <el-icon><ElIconChromeFilled /></el-icon>
+                  <span>hub-docker</span>
               </el-menu-item>
           </el-menu>
       </aside>
@@ -16,16 +24,32 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import {ref} from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import {ref, watch} from 'vue'
 // 登录状态：从localStorage读取
 const router = useRouter()
+const route = useRoute()
 
 const miniNav = ref(localStorage.getItem('miniNav') === 'true')
 
 const handleMenuSelect = (path) => {
     router.push(path)
 }
+const isLogin = ref(false)
+watch(
+  () => route, // 监听当前路由的完整对象
+  (newRoute, oldRoute) => {
+     if (newRoute.path === '/login') {
+        isLogin.value = false;
+     } else {
+        isLogin.value = true;
+     }
+  },
+  {
+    immediate: true,
+    deep: true
+  }
+)
 
 </script>
 
@@ -34,7 +58,9 @@ const handleMenuSelect = (path) => {
     display: flex;
     width: 150px;
     background-color: #2c3e50;
-    overflow: hidden;
+    overflow-x: hidden;
+    height: 100%;
+    box-sizing: border-box;
 }
 .mini-menu {
     width: 40px;

@@ -1,20 +1,9 @@
 <template>
-  <div class="top-nav" v-show="isLogin">
+  <div class="top-nav">
     <!-- 左侧logo和标题 -->
     <div class="nav-left">
       <span class="nav-operation" @click="handleNavOperation"><el-icon class="nav-logo"><Operation /></el-icon></span>
-      <span class="nav-title">云网盘</span>
-    </div>
-
-    <!-- 中间搜索框 -->
-    <div class="nav-center">
-      <el-input
-          v-model="searchText"
-          placeholder="搜索文件或文件夹..."
-          prefix-icon="Search"
-          class="search-input"
-          @keyup.enter="handleSearch"
-      ></el-input>
+      <span class="nav-title">Qagent</span>
     </div>
 
     <!-- 右侧用户区域 -->
@@ -30,11 +19,7 @@
 
       <!-- 用户信息与下拉菜单 -->
       <div class="user-area" @click.stop="toggleUserMenu">
-        <el-avatar class="user-avatar" :src="userAvatar">
-          <span v-if="!userAvatar" class="avatar-placeholder">{{ userInitial }}</span>
-        </el-avatar>
-        <span class="user-name">{{ userName }}</span>
-
+        <span class="user-name">{{ userInfo.username }}</span>
         <!-- 下拉菜单 -->
         <div
             class="user-dropdown"
@@ -61,13 +46,12 @@
 </template>
 
 <script setup>
-import {ref, computed, onMounted, onUnmounted} from 'vue'
-import { useRouter } from 'vue-router'
+import {ref, computed, onMounted, onUnmounted, watch} from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import {
   User, Setting, Logout, Operation
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import eventBus from '@/utils/eventBus'
 import {userAPI} from "@/api/userinfo";
 
 // 状态管理
@@ -78,31 +62,9 @@ const userInfo = ref({
   avatar: '',
   username: ''
 })
-const isLogin = ref(localStorage.getItem('isLogin') === 'true')
 
 // 路由实例
 const router = useRouter()
-
-// 计算属性：用户姓名首字母
-const userInitial = computed(() => {
-  return userInfo.value.name ? userInfo.value.name.charAt(0).toUpperCase() : 'U'
-})
-
-// 快捷访问用户信息
-const userName = computed(() => userInfo.value.name || userInfo.value.username)
-const userAvatar = computed(() => userInfo.value.avatar)
-
-const handleNavOperation = () => {
-    const miniNavValue = localStorage.getItem('miniNav')
-    let value = false;
-    if (miniNavValue) {
-        localStorage.removeItem('miniNav')
-    } else {
-        value = true;
-        localStorage.setItem('miniNav', "true")
-    }
-    eventBus.emit('data-event', {type: 'miniNav', value: value})
-}
 
 // 切换用户下拉菜单
 const toggleUserMenu = () => {
@@ -113,15 +75,6 @@ const toggleUserMenu = () => {
 const closeUserMenu = (e) => {
   if (!e.target.closest('.user-area')) {
     userMenuVisible.value = false
-  }
-}
-
-// 搜索处理
-const handleSearch = () => {
-  if (searchText.value.trim()) {
-    ElMessage.success(`搜索: ${searchText.value}`)
-    // 实际项目中可跳转到搜索结果页
-    // router.push({ path: '/search', query: { q: searchText.value } })
   }
 }
 
@@ -162,32 +115,9 @@ const fetchUserInfo = async () => {
   }
 }
 
-const handleReceivedData = (data) => {
-    if (data && data['type']) {
-        const type = data['type']
-        const value = data['value']
-        if (type === 'isLogin') {
-            isLogin.value = value
-        }
-    }
-}
+const route = useRoute()
+watch(() => route.path, fetchUserInfo, { immediate: true })
 
-// 初始化
-onMounted(() => {
-  // 获取用户信息
-  if (isLogin.value) {
-    fetchUserInfo()
-  }
-  eventBus.on('data-event', handleReceivedData)
-  // 监听点击事件关闭下拉菜单
-  document.addEventListener('click', closeUserMenu)
-})
-
-// 清理事件监听
-onUnmounted(() => {
-  document.removeEventListener('click', closeUserMenu)
-  eventBus.off('data-event', handleReceivedData)
-})
 </script>
 
 <style scoped>
