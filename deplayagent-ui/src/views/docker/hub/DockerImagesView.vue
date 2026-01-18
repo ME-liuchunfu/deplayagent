@@ -9,7 +9,7 @@
         label-width="80px"
       >
         <el-form-item label="hub" prop="hub">
-          <el-select style="width: 200px" placeholder="请选择hubid" @change="handleHubChange">
+          <el-select v-model="refhubid" style="width: 200px" placeholder="请选择hubid" @change="handleHubChange">
             <el-option v-for="item in hubIds" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
@@ -59,6 +59,7 @@ const route = useRoute()
 
 const refQuery = ref({})
 const hubIds = ref([])
+const refhubid = ref(null)
 
 const flushData = () =>{
    getTableList()

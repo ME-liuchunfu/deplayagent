@@ -11,4 +11,4 @@ def sync_qagent_container():
     def wrapper():
         response = requests.post(f'http://localhost:{app_port}/api/qagent/server_container/sync?token={random_token}')
         logger.info(f'response==>{response.text}')
-    schedule.every(10).seconds.do(wrapper)
+    schedule.every(60).seconds.do(wrapper)

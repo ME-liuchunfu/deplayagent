@@ -87,7 +87,7 @@
         <el-table-column prop="size" label="size" width="150" align="center" />
         <el-table-column prop="names" label="names" width="150" align="center" show-overflow-tooltip/>
         <el-table-column prop="labels" label="labels" width="150" align="center" show-overflow-tooltip/>
-        <el-table-column label="操作" width="150" align="center">
+        <el-table-column label="操作" width="150" align="center" fixed="right">
           <template #default="scope">
             <el-button type="primary" size="small" @click="handleRestart(scope.row)">重启</el-button>
             <el-button type="danger" size="small" @click="handleDown(scope.row)">下架</el-button>
@@ -97,7 +97,55 @@
         </el-table-column>
       </el-table>
     </div>
+    <el-dialog
+        v-model="rollbackVisible"
+        title="回滚"
+        width="500px"
+        destroy-on-close
+        append-to-body
+        @closed="closeRollBack"
+      >
+        <el-form
+          ref="formRef"
+          :model="rollbackForm"
+          :rules="rollbackFormRules"
+          label-width="100px"
+          label-position="right"
+        >
+          <el-form-item label="选择HUB服务" prop="hubId">
+            <el-select clearable v-model="rollbackForm.hubId" style="width: 200px" placeholder="请选择hubid" @change="handleHubChange">
+              <el-option v-for="item in hubIds" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            </el-select>
+          </el-form-item>
 
+          <el-form-item label="选择repo服务" prop="repo_tag">
+            <el-select clearable v-model="rollbackForm.repo_tag" style="width: 200px" placeholder="请选择repo_tag" @change="handleRepoChange">
+              <el-option v-for="item in repos" :key="item" :label="item" :value="item"></el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="选择tags服务" prop="tags">
+            <el-select clearable v-model="rollbackForm.tags" style="width: 200px" placeholder="请选择tags" @change="handleTagsChange">
+              <el-option v-for="item in tags" :key="item" :label="item" :value="item"></el-option>
+            </el-select>
+          </el-form-item>
+          <div>
+            <p>hub-url: {{rollbackData.domain}}</p>
+            <p>hub-repo: {{rollbackData.repo_tag}}</p>
+            <p>hub-tags: {{rollbackData.tags}}</p>
+            <p>login_url: {{rollbackData.login_url}}</p>
+            <p>username: {{rollbackData.username}}</p>
+            <p>password: {{rollbackData.password}}</p>
+          </div>
+        </el-form>
+
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="rollbackVisible = false">取消</el-button>
+            <el-button type="primary" @click="handleRollBackSubmit">确认回滚</el-button>
+          </span>
+        </template>
+      </el-dialog>
   </div>
 </template>
 
@@ -106,7 +154,9 @@ import {ref, reactive, onMounted, watch} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {containerApi} from '@/api/qagent/container'
 import {serverApi} from '@/api/qagent/server'
+import {engineApi} from '@/api/docker/hub/engine'
 import {useRoute} from "vue-router";
+import {imagesApi} from "@/api/docker/hub/images";
 
 const route = useRoute()
 
@@ -213,8 +263,133 @@ const handleUp = async (row)=>{
     ElMessage.info('取消上架')
   }
 }
-const handleRollback = (row)=>{
 
+const rollbackVisible = ref(false)
+const rollbackForm = reactive({
+  hubId: null,
+  repo_tag: null,
+  tags: null,
+  login_url: null,
+  username: null,
+  password: null
+})
+const rollbackFormRules = reactive({
+  hubId: [
+    { required: true, message: '请输入服务名称', trigger: 'blur' },
+  ],
+  repo_tag: [
+    { required: true, message: '请输入服务repo', trigger: 'blur' },
+  ],
+  tags: [
+    { required: true, message: '请输入服务tags', trigger: 'blur' },
+  ],
+})
+const hubIds = ref([])
+
+const queryHubIds = async () =>{
+    try{
+      const rows = await engineApi.listids()
+      hubIds.value = rows || []
+    } catch (_) {
+      console.error(_)
+    }
+}
+
+const handleRollback = async (row)=>{
+  rollbackData.value.id = row.id
+  await queryHubIds()
+  rollbackVisible.value = true
+}
+
+const repos = ref([])
+const handleHubChange = async (val)=>{
+  try {
+    const res = await imagesApi.query(val)
+    console.log('repo', res)
+    repos.value = res || []
+  } catch (e) {
+    console.log(e)
+  }
+}
+const tags = ref([])
+const handleRepoChange = async (val)=>{
+  try {
+    const res = await imagesApi.tags(rollbackForm.hubId, val)
+    console.log('tags', res)
+    tags.value = res || []
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+const rollbackData = ref({
+  id: null,
+  hubId: null,
+  domain: null,
+  repo_tag: null,
+  tags: null,
+  login_url: null,
+  username: null,
+  password: null,
+})
+
+const closeRollBack = ()=> {
+  rollbackData.value = {
+    id: null,
+    hubId: null,
+    domain: null,
+    repo_tag: null,
+    tags: null,
+    login_url: null,
+    username: null,
+    password: null,
+  }
+}
+
+const handleTagsChange = async (val)=>{
+  try{
+    const engine = await engineApi.get(rollbackForm.hubId)
+    console.log('engine', engine)
+    rollbackData.value.hubId = rollbackForm.hubId
+    rollbackData.value.domain = engine.domain
+
+    let login_url = engine.domain
+    if (login_url.startsWith('https://')) {
+      login_url = login_url.replace('https://', '')
+    }
+    if (login_url.startsWith('http://')) {
+      login_url = login_url.replace('http://', '')
+    }
+
+    if (login_url.endsWith('/', '')) {
+      login_url = login_url.substring(0, login_url.length -1)
+    }
+
+    rollbackData.value.repo_tag = login_url + '/' + rollbackForm.repo_tag + ':' + val
+    rollbackData.value.tags = val
+
+    rollbackData.value.login_url = login_url
+    rollbackData.value.username = engine.username
+    rollbackData.value.password = engine.passwd
+  } catch (_){
+    console.log(_)
+  }
+}
+const handleRollBackSubmit = async ()=>{
+  try{
+    await ElMessageBox.confirm('确定要回滚容器吗？', '确认', {type: 'info'})
+    const resp = await containerApi.rollback(rollbackData.value.id, {
+      repo_tag: rollbackData.value.repo_tag,
+      login_url: rollbackData.value.login_url,
+      username: rollbackData.value.username,
+      password: rollbackData.value.password
+    })
+    console.log(resp)
+    ElMessage.success('回滚成功' + resp)
+  } catch (e) {
+    console.log(e)
+    ElMessage.error('取消成功' + e)
+  }
 }
 
 const queryServerIds = async ()=>{

@@ -143,7 +143,7 @@ async def asyncinfos(
 @router.post("/rollback/{id}")
 async def rollback(
     id: int,
-    image_pull: ImagesPull = Depends(),
+    image_pull: ImagesPull,
     db: AsyncSession = Depends(init_setup.get_async_db),
     current_user: dict = Depends(get_current_user)
 ):
