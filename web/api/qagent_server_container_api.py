@@ -55,6 +55,13 @@ async def querylist(
     return resp_ok(data=rows)
 
 
+@router.post("/token")
+async def gettoken(
+    db: AsyncSession = Depends(init_setup.get_async_db)
+):
+    return resp_ok(data=random_token)
+
+
 @router.post("/sync")
 async def asyncinfos(
     token: str,
@@ -82,10 +89,13 @@ async def asyncinfos(
                         infos = response.infos
                         for info in infos:
                             work_path = None
+                            images_hash = None
                             ll = info.labels.split(',')
                             for l in ll:
                                 if l.startswith('com.docker.compose.project.working_dir='):
                                     work_path = l.replace('com.docker.compose.project.working_dir=', '')
+                                if l.startswith('com.docker.compose.image='):
+                                    images_hash = l.replace('com.docker.compose.image=', '')
                             d = {
                                 'server_id': row.id,
                                 'container_id': info.id,
@@ -93,7 +103,7 @@ async def asyncinfos(
                                 'work_path': work_path,
                                 'command': info.command,
                                 'created_at': info.created_at,
-                                'image': info.image,
+                                'images_id': info.image,
                                 'names': info.names,
                                 'labels': info.labels,
                                 'ports': info.ports,
@@ -121,6 +131,7 @@ async def asyncinfos(
                                     for key, value in ii.items():
                                         if hasattr(query_row, key):
                                             setattr(query_row, key, value)
+                                    db.add(query_row)
                                     await db.commit()
                                     await db.refresh(query_row)
                                 logger.info(f'同步服务器：{qagent_config}，容器:{query_row}')
@@ -152,7 +163,7 @@ async def rollback(
             "work_path": row.work_path,
             "images_name": image_pull.repo_tag
         })
-    response = stub.pull_images(request)
+        response = stub.container_rollback(request)
     return resp_ok(msg=response.msg) if response.code == 0 else resp_fail(msg=response.msg)
 
 
@@ -175,7 +186,7 @@ async def up(
             "container_name": row.container_name,
             "work_path": row.work_path,
         })
-    response = stub.pull_images(request)
+        response = stub.container_up(request)
     return resp_ok(msg=response.msg) if response.code == 0 else resp_fail(msg=response.msg)
 
 
@@ -199,7 +210,7 @@ async def down(
             "container_name": row.container_name,
             "work_path": row.work_path,
         })
-    response = stub.pull_images(request)
+        response = stub.container_down(request)
     return resp_ok(msg=response.msg) if response.code == 0 else resp_fail(msg=response.msg)
 
 
@@ -222,7 +233,7 @@ async def restart(
             "container_name": row.container_name,
             "work_path": row.work_path,
         })
-    response = stub.pull_images(request)
+        response = stub.container_restart(request)
     return resp_ok(msg=response.msg) if response.code == 0 else resp_fail(msg=response.msg)
 
 

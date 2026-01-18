@@ -42,7 +42,7 @@ async def listhubids(
     qb = await db.execute(sql)
     rows = qb.scalars().all()
     datas = [{"id":item.id, "name": item.name} for item in rows]
-    return resp_ok(data=rows)
+    return resp_ok(data=datas)
 
 
 @router.get("/list")

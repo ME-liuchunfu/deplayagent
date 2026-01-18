@@ -10,7 +10,7 @@
       >
         <el-form-item label="hub" prop="hub">
           <el-select style="width: 200px" placeholder="请选择hubid" @change="handleHubChange">
-            <el-option v-for="item in hubIds" :label="item.name" :value="item.id"></el-option>
+            <el-option v-for="item in hubIds" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -36,7 +36,7 @@
         <el-table-column prop="repo" label="repo" width="200" align="center" />
         <el-table-column label="tags" align="left">
           <template #default="scope">
-            <div v-for="item in scope.row.tags">{{item.size}} {{item.version}}
+            <div v-for="item in scope.row.tags" :key="item">{{item.size}} {{item.version}}
               <span style="color: #5ba0ff;cursor: pointer;" @click="commonUtil.copyTest(item.pull_url)"><el-icon><ElIconConnection /></el-icon></span>
               <span style="color: #ff4d4f;cursor: pointer;" @click="handleDel({repo: scope.row.repo, tag: item.version_code})"><el-icon><ElIconCloseBold /></el-icon></span>
             </div>

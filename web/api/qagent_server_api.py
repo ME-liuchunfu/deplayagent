@@ -43,15 +43,27 @@ async def querylist(
 ):
     sql = select(DbQAgentServer)
     if StrUtil.is_not_blank(query.name):
-        sql.filter(DbQAgentServer.name.like(f'{query.name}%'))
+        sql = sql.filter(DbQAgentServer.name.like(f'{query.name}%'))
     if StrUtil.is_not_blank(query.host):
-        sql.filter(DbQAgentServer.host.like(f'{query.host}%'))
+        sql = sql.filter(DbQAgentServer.host.like(f'{query.host}%'))
     if StrUtil.is_not_none(query.status):
-        sql.filter(DbQAgentServer.status == query.status)
+        sql = sql.filter(DbQAgentServer.status == query.status)
     qb = await db.execute(sql)
     rows = qb.scalars().all()
     return resp_ok(data=rows)
 
+
+
+@router.get("/ids")
+async def queryids(
+    db: AsyncSession = Depends(init_setup.get_async_db),
+    current_user: dict = Depends(get_current_user)
+):
+    sql = select(DbQAgentServer)
+    qb = await db.execute(sql)
+    rows = qb.scalars().all()
+    datas = [{"id": item.id, "name": item.name} for item in rows]
+    return resp_ok(data=datas)
 
 
 @router.get("/get/{id}")

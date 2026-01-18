@@ -29,8 +29,8 @@ proxy.$timer.start(10000, async () => {
      const token = cacheInfo.token()
      let expires_minutes = token.expires_minutes
      let mul = token.now
-     let tm = 1000 * mul + expires_minutes
-     if (tm > now + 300000) {
+     let tm = 60 * 1000 * expires_minutes + mul
+     if (tm > now + 5 * 60 * 1000) {
         console.log('at time:' + now)
         return
      }

@@ -20,7 +20,7 @@ class StrUtil:
 
     @classmethod
     def is_not_none(cls, value: Optional[Any]):
-        return cls.is_none(value)
+        return not cls.is_none(value)
 
     @classmethod
     def is_not_blank(cls, value: Optional[str]) -> bool:
