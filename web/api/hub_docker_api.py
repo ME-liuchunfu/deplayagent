@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from data.asyncl.mysql_data import init_setup
 from data.asyncl.mysql_orm import DockerServer
+from utils import StrUtil
 from utils.jwt_auth import get_current_user
 from web import resp_ok, resp_fail
 from sqlalchemy import select
@@ -31,6 +32,19 @@ class PutDockerServer(BaseModel):
     passwd: Optional[str] = None
 
 
+
+@router.get("/ids")
+async def listhubids(
+    db: AsyncSession = Depends(init_setup.get_async_db),
+    current_user: dict = Depends(get_current_user)
+):
+    sql = select(DockerServer)
+    qb = await db.execute(sql)
+    rows = qb.scalars().all()
+    datas = [{"id":item.id, "name": item.name} for item in rows]
+    return resp_ok(data=rows)
+
+
 @router.get("/list")
 async def list(
     query: ListQuery = Depends(),
@@ -38,10 +52,10 @@ async def list(
     current_user: dict = Depends(get_current_user)
 ):
     sql = select(DockerServer)
-    if query.name:
-         sql.filter(DockerServer.name.like(f'{query.name}%'))
-    if query.domain:
-         sql.filter(DockerServer.domain.like(f'{query.domain}%'))
+    if StrUtil.is_not_blank(query.name):
+         sql = sql.filter(DockerServer.name.like(f'{query.name}%'))
+    if StrUtil.is_not_blank(query.domain):
+         sql = sql.filter(DockerServer.domain.like(f'{query.domain}%'))
     qb = await db.execute(sql)
     rows = qb.scalars().all()
     return resp_ok(data=rows)

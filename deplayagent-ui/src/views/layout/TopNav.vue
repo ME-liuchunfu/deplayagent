@@ -1,8 +1,8 @@
 <template>
-  <div class="top-nav">
+  <div class="top-nav" v-if="isLogin">
     <!-- 左侧logo和标题 -->
     <div class="nav-left">
-      <span class="nav-operation" @click="handleNavOperation"><el-icon class="nav-logo"><Operation /></el-icon></span>
+      <span class="nav-operation"><el-icon class="nav-logo"><Operation /></el-icon></span>
       <span class="nav-title">Qagent</span>
     </div>
 
@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import {ref, computed, onMounted, onUnmounted, watch} from 'vue'
+import {ref, watch} from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import {
   User, Setting, Logout, Operation
@@ -55,7 +55,6 @@ import { ElMessage } from 'element-plus'
 import {userAPI} from "@/api/userinfo";
 
 // 状态管理
-const searchText = ref('')
 const userMenuVisible = ref(false)
 const userInfo = ref({
   name: '',
@@ -69,13 +68,6 @@ const router = useRouter()
 // 切换用户下拉菜单
 const toggleUserMenu = () => {
   userMenuVisible.value = !userMenuVisible.value
-}
-
-// 点击其他区域关闭下拉菜单
-const closeUserMenu = (e) => {
-  if (!e.target.closest('.user-area')) {
-    userMenuVisible.value = false
-  }
 }
 
 // 通知提示
@@ -116,8 +108,18 @@ const fetchUserInfo = async () => {
 }
 
 const route = useRoute()
-watch(() => route.path, fetchUserInfo, { immediate: true })
-
+const isLogin = ref(false)
+watch(() => route.path,
+    (newRoute, oldRoute)=>{
+       if (newRoute === '/login') {
+          isLogin.value = false;
+       } else {
+          isLogin.value = true;
+       }
+        fetchUserInfo()
+    },
+{ immediate: true }
+)
 </script>
 
 <style scoped>

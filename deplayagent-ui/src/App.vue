@@ -64,5 +64,6 @@ proxy.$timer.start(10000, async () => {
 }
 .main-content {
     flex: 1;
+    overflow: scroll;
 }
 </style>

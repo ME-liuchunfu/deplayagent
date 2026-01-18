@@ -43,13 +43,13 @@ async def querylist(
 ):
     sql = select(DbQAgentContainer)
     if StrUtil.is_not_blank(query.container_name):
-        sql.filter(DbQAgentContainer.container_name.like(f'{query.container_name}%'))
+        sql = sql.filter(DbQAgentContainer.container_name.like(f'{query.container_name}%'))
     if StrUtil.is_not_blank(query.images_id):
-        sql.filter(DbQAgentContainer.images_id.like(f'{query.images_id}%'))
+        sql = sql.filter(DbQAgentContainer.images_id.like(f'{query.images_id}%'))
     if StrUtil.is_not_blank(query.ports):
-        sql.filter(DbQAgentContainer.ports.like(f'{query.ports}%'))
+        sql = sql.filter(DbQAgentContainer.ports.like(f'{query.ports}%'))
     if StrUtil.is_not_none(query.server_id):
-        sql.filter(DbQAgentContainer.server_id == query.server_id)
+        sql = sql.filter(DbQAgentContainer.server_id == query.server_id)
     qb = await db.execute(sql)
     rows = qb.scalars().all()
     return resp_ok(data=rows)

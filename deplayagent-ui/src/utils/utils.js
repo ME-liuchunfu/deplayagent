@@ -1,5 +1,15 @@
+import {ElMessage} from "element-plus";
 
 export const commonUtil = {
+    copyTest: async (text)=>{
+        try {
+            await navigator.clipboard.writeText(String(text))
+            ElMessage.success('复制成功 ✔️')
+          } catch (err) {
+            ElMessage.error('复制失败 ❌，请手动复制')
+            console.error('复制报错：', err)
+          }
+    },
     inArray: (arr, item) => {
         for (let k in arr) {
             if (arr[k] && arr[k] === item) {

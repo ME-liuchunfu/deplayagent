@@ -2,11 +2,13 @@ import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from data.asyncl.mysql_data import init_setup
 from data.asyncl.mysql_orm import DockerServer
 from hub.docker_registry import DockerRegistryClient
+from utils import StrUtil
 from utils.jwt_auth import get_current_user
 from web import resp_fail, resp_ok
 
@@ -25,8 +27,37 @@ async def query_hub(hub_id: int, db: AsyncSession) -> Optional[DockerServer]:
     return data
 
 
+class ImagesDel(BaseModel):
+    hub_id: int
+    repo: str
+    tag: str
+
+@router.post("/repositories/del")
+async def all_repositories_del(
+    images_del: ImagesDel,
+    db: AsyncSession = Depends(init_setup.get_async_db),
+    current_user: dict = Depends(get_current_user)
+):
+    hub_id = images_del.hub_id
+    repo = images_del.repo
+    tag = images_del.tag
+    if StrUtil.is_none(hub_id) or StrUtil.is_none(repo) or StrUtil.is_none(tag):
+        return resp_fail('缺失参数')
+    data = await query_hub(hub_id, db)
+    domain = data.domain
+    if domain.endswith('/'):
+        domain = domain[0:-1]
+    registry_client = DockerRegistryClient(
+        registry_url=domain,
+        username=data.username,
+        password=data.passwd
+    )
+    del_flag = registry_client.delete_image_by_tag(repo, tag)
+    return resp_ok() if del_flag else resp_fail()
+
+
 @router.get("/repositories/all/{hub_id}")
-async def all_repositories(
+async def all_repositories_all(
     hub_id: int,
     db: AsyncSession = Depends(init_setup.get_async_db),
     current_user: dict = Depends(get_current_user)
@@ -71,6 +102,7 @@ async def all_repositories(
                                 size = size / (1024 * 1024)
                                 image_size = f'{size:.4f}MB'
                             item.get("tags").append({
+                                "version_code": version,
                                 "version": f"{repo}:{version}",
                                 "pull_url": f"{pull_domain}/{repo}:{version}",
                                 "size": image_size
@@ -83,7 +115,7 @@ async def all_repositories(
 
 
 @router.get("/repositories/query/{hub_id}")
-async def all_repositories(
+async def all_repositories_get(
     hub_id: int,
     db: AsyncSession = Depends(init_setup.get_async_db),
     current_user: dict = Depends(get_current_user)

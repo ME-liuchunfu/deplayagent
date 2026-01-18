@@ -182,7 +182,7 @@ const handleLogin = async () => {
 
 /* 登录卡片（Rem 尺寸） */
 .login-card {
-    width: 100%;
+    width: 300px;
     max-width: 34500px; /* 345px */
     background-color: #fff;
     border-radius: 20px; /* 20px */

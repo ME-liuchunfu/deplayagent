@@ -10,7 +10,8 @@ dotenv_dict = dotenv_values(env_name)
 
 # ========== JWT核心配置 ==========
 # 密钥：生产环境建议用secrets生成随机密钥，不要写死！
-SECRET_KEY = secrets.token_hex(32)  # 生成32位随机密钥，绝对安全
+#SECRET_KEY = secrets.token_hex(32)  # 生成32位随机密钥，绝对安全
+SECRET_KEY = "272e19a7f0a945b7892a8c1d6e0f3b5c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a"  # 生成32位随机密钥，绝对安全
 # 加密算法，固定用HS256即可
 ALGORITHM = "HS256"
 # Token过期时间：单位 分钟，这里配置2小时 = 120分钟
