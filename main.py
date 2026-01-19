@@ -25,11 +25,11 @@ from data.asyncl import mysql_data, mysql_orm
 from task import schedule_task
 
 
-log_dir = "../deplayagent-logs"
+log_dir = "./logs"
 if not os.path.exists(log_dir):
     os.makedirs(log_dir, exist_ok=True)
 
-setup_rotating_log(log_file="../deplayagent-logs/app.log")
+setup_rotating_log(log_file=f"{log_dir}/app.log")
 logger = logging.getLogger(__name__)
 
 

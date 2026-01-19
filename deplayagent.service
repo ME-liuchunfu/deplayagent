@@ -1,0 +1,30 @@
+[Unit]
+Description = deplayagent
+
+After=network.target network-online.target nss-lookup.target
+Wants=network.target network-online.target
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /usr/local/deplayagent/deplayagent.sh restart
+ExecStop=/bin/bash /usr/local/deplayagent/deplayagent.sh stop
+PIDFile=/usr/local/deplayagent/run.pid
+
+# 如果脚本需要重启策略，可以设置Restart和RestartSec
+#Restart=on-failure
+Restart=always
+RestartSec=5s
+User=root
+
+StartLimitInterval=60s
+StartLimitBurst=3
+TimeoutStartSec=300
+TimeoutStopSec=60
+SuccessExitStatus=0 143
+
+WorkingDirectory=/usr/local/deplayagent
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+[Install]
+WantedBy = multi-user.target
+
