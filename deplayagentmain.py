@@ -98,4 +98,4 @@ async def global_exception_handler(request: Request, exc: Exception):
 if __name__ == '__main__':
     import uvicorn
     # uvicorn.run("文件名称:app实例", 主机, 端口, 是否热重载)
-    uvicorn.run("main:app", host="0.0.0.0", port=app_port, reload=False)
+    uvicorn.run("deplayagentmain:app", host="0.0.0.0", port=app_port, reload=False)

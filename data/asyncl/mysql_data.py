@@ -2,11 +2,12 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
 from setting import DataBaseSettings
+from urllib.parse import quote_plus
 
 class InitSetup:
 
     def setup_mysql(self, db_config: DataBaseSettings):
-        ASYNC_DATABASE_URL = f"mysql+asyncmy://{db_config.database_user}:{db_config.database_passwd}@{db_config.database_host}:{db_config.database_port}/{db_config.database_dbname}"
+        ASYNC_DATABASE_URL = f"mysql+asyncmy://{quote_plus(db_config.database_user)}:{quote_plus(db_config.database_passwd)}@{db_config.database_host}:{db_config.database_port}/{db_config.database_dbname}"
         if db_config.database_param is not None:
             ASYNC_DATABASE_URL = f'{ASYNC_DATABASE_URL}?{db_config.database_param}'
         else:
